@@ -11,7 +11,7 @@ import javax.print.attribute.Size2DSyntax;
  *
  * @author VuongDinh
  */
-public class fileInfo {
+public class FileInfo {
 
     private String fileName;
     private String sourcePath;

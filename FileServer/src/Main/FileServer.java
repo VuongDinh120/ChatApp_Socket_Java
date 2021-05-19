@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fileserver;
+package Main;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -22,7 +22,7 @@ public class FileServer {
 
     public static void main(String[] args) throws IOException {
         List<File> files = getListFile("D:\\Music\\Chrono Cross Original Soundtrack Revival Disc [FLAC]");
-        TCP_File_Master sendInfoToMaster = new TCP_File_Master(FileServerHost, FileServerPort);
+        MasterServerHandler sendInfoToMaster = new MasterServerHandler(FileServerHost, FileServerPort);
         sendInfoToMaster.createConnection(files);
     }
 

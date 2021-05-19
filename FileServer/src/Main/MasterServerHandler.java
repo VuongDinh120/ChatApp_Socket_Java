@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fileserver;
+package Main;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,15 +20,15 @@ import javax.net.ssl.HostnameVerifier;
  *
  * @author VuongDinh
  */
-public class TCP_File_Master {
+public class MasterServerHandler {
 
     private int FileServerPort;
     private String FileServerHost;
 
-    public TCP_File_Master() {
+    public MasterServerHandler() {
     }
 
-    public TCP_File_Master(String FileServerHost, int FileServerPort) {
+    public MasterServerHandler(String FileServerHost, int FileServerPort) {
         this.FileServerPort = FileServerPort;
         this.FileServerHost = FileServerHost;
     }
