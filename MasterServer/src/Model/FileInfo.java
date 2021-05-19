@@ -3,9 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
-
-import javax.print.attribute.Size2DSyntax;
+package Model;
 
 /**
  *
@@ -18,6 +16,14 @@ public class FileInfo {
     private float sizeMB;
     private int port;
     private String host;
+
+    public FileInfo(String fileName, String sourcePath, float sizeMB, int port, String host) {
+        this.fileName = fileName;
+        this.sourcePath = sourcePath;
+        this.sizeMB = sizeMB;
+        this.port = port;
+        this.host = host;
+    }
 
     public String getFileName() {
         return fileName;

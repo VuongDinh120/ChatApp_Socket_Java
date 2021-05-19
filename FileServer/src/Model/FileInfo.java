@@ -5,96 +5,64 @@
  */
 package Model;
 
-import java.io.Serializable;
-
 /**
  *
  * @author VuongDinh
  */
-public class FileInfo implements Serializable {
+public class FileInfo {
 
-    private static final long serialVersionUID = 1L;
+    private String fileName;
+    private String sourcePath;
+    private float sizeMB;
+    private int port;
+    private String host;
 
-    private String destinationDirectory;
-    private String sourceDirectory;
-    private String filename;
-    private long fileSize;
-    private int piecesOfFile;
-    private int lastByteLength;
-    private String status;
-
-    public FileInfo() {
+    public FileInfo(String fileName, String sourcePath, float sizeMB, int port, String host) {
+        this.fileName = fileName;
+        this.sourcePath = sourcePath;
+        this.sizeMB = sizeMB;
+        this.port = port;
+        this.host = host;
     }
 
-    public FileInfo(String destinationDirectory, String sourceDirectory, String filename, long fileSize, int piecesOfFile, int lastByteLength, String status) {
-        this.destinationDirectory = destinationDirectory;
-        this.sourceDirectory = sourceDirectory;
-        this.filename = filename;
-        this.fileSize = fileSize;
-        this.piecesOfFile = piecesOfFile;
-        this.lastByteLength = lastByteLength;
-        this.status = status;
+    public String getFileName() {
+        return fileName;
     }
 
-    public String getDestinationDirectory() {
-        return destinationDirectory;
+    public String getHost() {
+        return host;
     }
 
-    public long getFileSize() {
-        return fileSize;
+    public int getPort() {
+        return port;
     }
 
-    public String getFilename() {
-        return filename;
+    public float getSizeMB() {
+        return sizeMB;
     }
 
-    public int getLastByteLength() {
-        return lastByteLength;
+    public String getSourcePath() {
+        return sourcePath;
     }
 
-    public int getPiecesOfFile() {
-        return piecesOfFile;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public String getSourceDirectory() {
-        return sourceDirectory;
+    public void setPort(int port) {
+        this.port = port;
     }
 
-    public String getStatus() {
-        return status;
+    public void setSizeMB(float sizeMB) {
+        this.sizeMB = sizeMB;
     }
 
-    public void setDestinationDirectory(String destinationDirectory) {
-        this.destinationDirectory = destinationDirectory;
+    public void setSourcePath(String sourcePath) {
+        this.sourcePath = sourcePath;
     }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public void setLastByteLength(int lastByteLength) {
-        this.lastByteLength = lastByteLength;
-    }
-
-    public void setPiecesOfFile(int piecesOfFile) {
-        this.piecesOfFile = piecesOfFile;
-    }
-
-    public void setSourceDirectory(String sourceDirectory) {
-        this.sourceDirectory = sourceDirectory;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    
 }

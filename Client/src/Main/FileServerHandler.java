@@ -5,7 +5,7 @@
  */
 package Main;
 
-import Model.FileInfo;
+import Model.DownloadFileInfo;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -51,7 +51,7 @@ public class FileServerHandler implements Runnable {
             ds.receive(receivePacket);
             ByteArrayInputStream bais = new ByteArrayInputStream(receivePacket.getData());
             ObjectInputStream ois = new ObjectInputStream(bais);
-            FileInfo fileInfo = (FileInfo) ois.readObject();
+            DownloadFileInfo fileInfo = (DownloadFileInfo) ois.readObject();
             ois.close();
             bais.close();
             // show file info

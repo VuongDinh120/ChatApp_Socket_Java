@@ -17,7 +17,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import Model.FileInfo;
+import Model.DownloadFileInfo;
 
 /**
  *
@@ -46,7 +46,7 @@ public class Client {
             ds.receive(receivePacket);
             ByteArrayInputStream bais = new ByteArrayInputStream(receivePacket.getData());
             ObjectInputStream ois = new ObjectInputStream(bais);
-            FileInfo fileInfo = (FileInfo) ois.readObject();
+            DownloadFileInfo fileInfo = (DownloadFileInfo) ois.readObject();
 
             // show file info
             if (fileInfo != null) {

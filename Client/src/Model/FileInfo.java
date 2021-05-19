@@ -1,74 +1,68 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package Model;
 
-import java.io.Serializable;
+/**
+ *
+ * @author VuongDinh
+ */
+public class FileInfo {
 
-public class FileInfo implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private String fileName;
+    private String sourcePath;
+    private float sizeMB;
+    private int port;
+    private String host;
 
-    private String destinationDirectory;
-    private String sourceDirectory;
-    private String filename;
-    private long fileSize;
-    private int piecesOfFile;
-    private int lastByteLength;
-    private String status;
-
-    public FileInfo() {
+    public FileInfo(String fileName, String sourcePath, float sizeMB, int port, String host) {
+        this.fileName = fileName;
+        this.sourcePath = sourcePath;
+        this.sizeMB = sizeMB;
+        this.port = port;
+        this.host = host;
     }
 
-    public String getDestinationDirectory() {
-        return destinationDirectory;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setDestinationDirectory(String destinationDirectory) {
-        this.destinationDirectory = destinationDirectory;
+    public String getHost() {
+        return host;
     }
 
-    public String getSourceDirectory() {
-        return sourceDirectory;
+    public int getPort() {
+        return port;
     }
 
-    public void setSourceDirectory(String sourceDirectory) {
-        this.sourceDirectory = sourceDirectory;
+    public float getSizeMB() {
+        return sizeMB;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getSourcePath() {
+        return sourcePath;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public long getFileSize() {
-        return fileSize;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
+    public void setPort(int port) {
+        this.port = port;
     }
 
-    public int getPiecesOfFile() {
-        return piecesOfFile;
+    public void setSizeMB(float sizeMB) {
+        this.sizeMB = sizeMB;
     }
 
-    public void setPiecesOfFile(int piecesOfFile) {
-        this.piecesOfFile = piecesOfFile;
+    public void setSourcePath(String sourcePath) {
+        this.sourcePath = sourcePath;
     }
 
-    public int getLastByteLength() {
-        return lastByteLength;
-    }
-
-    public void setLastByteLength(int lastByteLength) {
-        this.lastByteLength = lastByteLength;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

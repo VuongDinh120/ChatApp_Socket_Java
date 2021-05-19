@@ -5,7 +5,7 @@
  */
 package Main;
 
-import Model.FileInfo;
+import Model.DownloadFileInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class ClientHandler implements Runnable {
         this.ClientAddress = ClientAddress;
     }
 
-    public FileInfo getFileInfo(String filePath) {
+    public DownloadFileInfo getFileInfo(String filePath) {
         // get file size
         File fileSend = new File(filePath);
         long fileLength = fileSend.length();
@@ -47,7 +47,7 @@ public class ClientHandler implements Runnable {
         }
 
         // read file info
-        FileInfo fileInfo = new FileInfo();
+        DownloadFileInfo fileInfo = new DownloadFileInfo();
         fileInfo.setFilename(fileSend.getName());
         fileInfo.setFileSize(fileSend.length());
         fileInfo.setPiecesOfFile(piecesOfFile);
@@ -68,7 +68,7 @@ public class ClientHandler implements Runnable {
         try {
             DatagramPacket sendPacket;
 
-            FileInfo fileInfo = getFileInfo(filePath);
+            DownloadFileInfo fileInfo = getFileInfo(filePath);
             byte[] bytes = Files.readAllBytes(Paths.get(filePath));
 
             // send file info

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package masterserver;
+package Main;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -15,7 +15,7 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
-import model.FileInfo;
+import Model.FileInfo;
 
 /**
  *
