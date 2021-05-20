@@ -16,6 +16,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 /**
  *
@@ -63,25 +64,38 @@ public class FileServerHandler implements Runnable {
             }
 
             // get file content
-            System.out.println("Receiving file...");
+            System.out.println("Receiving file info...");
             File fileReceive = new File(destPath + fileInfo.getFilename());
             BufferedOutputStream bos = new BufferedOutputStream(
                     new FileOutputStream(fileReceive));
             // write pieces of file
-            for (int i = 0; i < (fileInfo.getPiecesOfFile() - 1); i++) {
+            ds.setSoTimeout(10000);
+            while (true) {
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                ds.receive(receivePacket);
-                System.out.println("Receive packet " + i);
-                bos.write(receiveData, 0, PIECES_OF_FILE_SIZE);
-            }
-            // write last bytes of file
-            receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            ds.receive(receivePacket);
-            bos.write(receiveData, 0, fileInfo.getLastByteLength());
-            bos.flush();
-            System.out.println("Done!");
-            System.out.println("Complete receive.");
+                try {
+                    for (int i = 0; i < (fileInfo.getPiecesOfFile() - 1); i++) {
 
+                        ds.receive(receivePacket);
+                        System.out.println("File: [" + fileInfo.getFilename() + "] \tReceive packet " + i);
+                        bos.write(receiveData, 0, PIECES_OF_FILE_SIZE);
+                        bos.flush();
+                    }
+                    receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                    ds.receive(receivePacket);
+                    bos.write(receiveData, 0, fileInfo.getLastByteLength());
+                    bos.flush();
+                    System.out.println("Done!");
+                    System.out.println("Complete download " + fileInfo.getFilename());
+                    break;
+                } catch (SocketTimeoutException e) {
+                    // resend
+                    ds.send(dp);
+
+                }
+                // check received data...
+            }
+
+            // write last bytes of file
             // close stream
             bos.close();
             ds.close();

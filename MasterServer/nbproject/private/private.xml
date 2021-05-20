@@ -3,9 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/JavaWorkspace/MasterServer/src/masterserver/ClientHandler.java</file>
-            <file>file:/E:/JavaWorkspace/MasterServer/src/masterserver/FileServerHandler.java</file>
-            <file>file:/E:/JavaWorkspace/MasterServer/src/masterserver/MasterServer.java</file>
+            <file>file:/E:/JavaWorkspace/Socket_Java/MasterServer/src/Main/MasterServer.java</file>
+            <file>file:/E:/JavaWorkspace/Socket_Java/MasterServer/src/Model/FileInfo.java</file>
+            <file>file:/E:/JavaWorkspace/Socket_Java/MasterServer/src/Main/ClientHandler.java</file>
+            <file>file:/E:/JavaWorkspace/Socket_Java/MasterServer/src/Main/FileServerHandler.java</file>
+            <file>file:/E:/JavaWorkspace/Socket_Java/MasterServer/src/Main/Handler.java</file>
         </group>
     </open-files>
 </project-private>

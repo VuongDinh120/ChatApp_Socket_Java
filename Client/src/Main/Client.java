@@ -18,6 +18,12 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import Model.DownloadFileInfo;
+import Model.FileInfo;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -26,67 +32,73 @@ import Model.DownloadFileInfo;
 public class Client {
 
     private static final int PIECES_OF_FILE_SIZE = 1024 * 32;
+    private static String destPath = "D:\\New folder\\";
+    public static final int NUM_OF_THREAD = 10;
+    public static final int SERVER_PORT = 3000;
+    public static final String SERVER_IP = "127.0.0.1";
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        List<FileInfo> masterFileList = new ArrayList<>();
+        MasterServerHandler masterHandler = new MasterServerHandler(SERVER_PORT, SERVER_IP);
+        masterFileList = masterHandler.getFiles();
+
+        System.out.println("Download all files.");
+        showListFile(masterFileList);
+        destPath = inputStorePath()+"\\";
+        System.out.println(masterFileList);
         try {
-            String filename = "Anaconda3-2020.11-Windows-x86_64.exe";
-            InetAddress ip = InetAddress.getByName("127.0.0.1");
+            ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREAD);
 
-            DatagramSocket ds = new DatagramSocket();
-
-            DatagramPacket dp = new DatagramPacket(filename.getBytes(), filename.length(), ip, 3000);
-            System.out.println("Sending file name ...");
-            ds.send(dp);
-
-            byte[] receiveData = new byte[PIECES_OF_FILE_SIZE];
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            ds.receive(receivePacket);
-            ByteArrayInputStream bais = new ByteArrayInputStream(receivePacket.getData());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            DownloadFileInfo fileInfo = (DownloadFileInfo) ois.readObject();
-
-            // show file info
-            if (fileInfo != null) {
-                System.out.println("File name: " + fileInfo.getFilename());
-                System.out.println("File size: " + fileInfo.getFileSize());
-                System.out.println("Pieces of file: " + fileInfo.getPiecesOfFile());
-                System.out.println("Last bytes length: " + fileInfo.getLastByteLength());
+            for (FileInfo fi : masterFileList) {
+                InetAddress ipAddress = InetAddress.getByName(fi.getHost());
+                FileServerHandler handler = new FileServerHandler(fi.getFileName(), destPath, ipAddress, fi.getPort());
+                Thread serviceThread = new Thread(handler);
+                executor.execute(serviceThread);
             }
-
-            // get file content
-            System.out.println("Receiving file...");
-            File fileReceive = new File("D:\\New folder\\"
-                    + fileInfo.getFilename());
-            BufferedOutputStream bos = new BufferedOutputStream(
-                    new FileOutputStream(fileReceive));
-            // write pieces of file
-            for (int i = 0; i < (fileInfo.getPiecesOfFile() - 1); i++) {
-                receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                ds.receive(receivePacket);
-                System.out.println("Receive packet " + i);
-                bos.write(receiveData, 0, PIECES_OF_FILE_SIZE);
-            }
-            // write last bytes of file
-            receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            ds.receive(receivePacket);
-            bos.write(receiveData, 0, fileInfo.getLastByteLength());
-            bos.flush();
-            System.out.println("Done!");
-            System.out.println("Complete receive.");
-
-            // close stream
-            bos.close();
-            ds.close();
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
         }
+        System.out.println("COMPLETE DOWNLOAD YOUR FILE. SEE YOU LATE!");
+        System.out.println("EXIT.");
     }
 
+    public static String inputStorePath() {
+        Scanner scan = new Scanner(System.in);
+        String path;
+        File fi;
+        do {
+            System.out.println("Enter your stored files location: ");
+            path = scan.nextLine();
+            fi = new File(path);
+
+            if (!fi.isDirectory()) {
+                System.out.println("Error: This is not a right path.");
+            }
+
+        } while (!fi.isDirectory());
+        return path;
+    }
+
+//    public static List<FileInfo> selectFilesDownload(List<FileInfo> masterFileList) {
+//        Scanner scan = new Scanner(System.in);
+//        String str = "";
+//        do {
+//
+//            System.out.println("Select file  to download: ");
+//            scan.nextLine();
+//            
+//        } while (!"".equals(str));
+//
+//        return ;
+//    }
+
+    public static void showListFile(List<FileInfo> masterFileList) {
+        System.out.println("List available files to download:");
+        for (int i = 0; i < masterFileList.size(); i++) {
+            System.out.println("\t" + i + ". " + masterFileList.get(i).toString());
+        }
+    }
 }

@@ -82,7 +82,7 @@ public class ClientHandler implements Runnable {
             oos.close();
             baos.close();
             // send file content
-            System.out.println("Sending file...");
+            System.out.println("Sending files...");
             // send pieces of file
             for (int i = 0, count = 0; i < fileInfo.getPiecesOfFile(); i++, count += PIECES_OF_FILE_SIZE) {
                 System.out.println("Sending Packet " + i);
@@ -97,7 +97,7 @@ public class ClientHandler implements Runnable {
                 sendPacket = new DatagramPacket(fileBytess, buff,
                         ClientAddress, ClientPort);
                 ServerSocket.send(sendPacket);
-                waitMillisecond(40);
+                waitMillisecond(100);
             }
 
             System.out.println("File has sent!!");

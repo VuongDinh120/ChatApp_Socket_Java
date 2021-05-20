@@ -5,15 +5,22 @@
  */
 package Main;
 
+import Model.FileInfo;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
 
 /**
@@ -22,53 +29,45 @@ import javax.net.ssl.HostnameVerifier;
  */
 public class MasterServerHandler {
 
-    private int FileServerPort;
-    private String FileServerHost;
+    private int MasterPort;
+    private String MasterHost;
 
-    public MasterServerHandler() {
+    public MasterServerHandler(int MasterPort, String MasterHost) {
+        this.MasterPort = MasterPort;
+        this.MasterHost = MasterHost;
     }
 
-    public MasterServerHandler(String FileServerHost, int FileServerPort) {
-        this.FileServerPort = FileServerPort;
-        this.FileServerHost = FileServerHost;
-    }
+    public void sendFiles(List<FileInfo> files) {
+        try {
+            //Tạo socket cho client kết nối đến server qua ID address và port number
+            Socket socket = new Socket(MasterHost, MasterPort);
 
-    public String getFileServerHost() {
-        return FileServerHost;
-    }
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-    public int getFileServerPort() {
-        return FileServerPort;
-    }
+            System.out.println("Send message");
+            out.writeUTF("fileserver:send_data");
+            out.flush();
 
-    public void setFileServerHost(String FileServerHost) {
-        this.FileServerHost = FileServerHost;
-    }
+            System.out.println("Wait response.");
+            String message = in.readUTF();
+            System.out.println(">> FROM MASTER SERVER: " + message);
 
-    public void setFileServerPort(int FileServerPort) {
-        this.FileServerPort = FileServerPort;
-    }
+            System.out.println("Send files..");
+            out.writeObject(files);
+//            out.flush();
+            System.out.println("Send finish.");
 
-    public void createConnection(List<File> files) throws IOException {
+            message = in.readUTF();
+            System.out.println(">> FROM MASTER SERVER: " + message);
 
-        //Tạo socket cho client kết nối đến server qua ID address và port number
-        Socket clientSocket = new Socket(FileServerHost, FileServerPort);
-
-        // get the output stream from the socket.
-        OutputStream outputStream = clientSocket.getOutputStream();
-        // create an object output stream from the output stream so we can send an object through it
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-        //Tạo inputStream nối với Socket
-        BufferedReader inFromServer
-                = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        //Gửi chuỗi ký tự tới Server thông qua outputStream đã nối với Socket (ở trên)
-        System.out.println("Sending messages to the ServerSocket");
-        objectOutputStream.writeObject(files);
-
-        System.out.println(">> FROM SERVER: " + inFromServer.readLine());
-        //Đóng liên kết socket
-        clientSocket.close();
+            System.out.println("Complete starting file server.");
+            socket.close();
+        } catch (EOFException e) {
+            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

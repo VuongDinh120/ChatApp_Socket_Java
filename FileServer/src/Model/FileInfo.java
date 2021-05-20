@@ -5,22 +5,23 @@
  */
 package Model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author VuongDinh
  */
-public class FileInfo {
+public class FileInfo implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String fileName;
-    private String sourcePath;
-    private float sizeMB;
+    private long size;
     private int port;
     private String host;
 
-    public FileInfo(String fileName, String sourcePath, float sizeMB, int port, String host) {
+    public FileInfo(String fileName, long size, int port, String host) {
         this.fileName = fileName;
-        this.sourcePath = sourcePath;
-        this.sizeMB = sizeMB;
+        this.size = size;
         this.port = port;
         this.host = host;
     }
@@ -37,12 +38,8 @@ public class FileInfo {
         return port;
     }
 
-    public float getSizeMB() {
-        return sizeMB;
-    }
-
-    public String getSourcePath() {
-        return sourcePath;
+    public long getSize() {
+        return size;
     }
 
     public void setFileName(String fileName) {
@@ -57,12 +54,12 @@ public class FileInfo {
         this.port = port;
     }
 
-    public void setSizeMB(float sizeMB) {
-        this.sizeMB = sizeMB;
+    public void setSize(long size) {
+        this.size = size;
     }
 
-    public void setSourcePath(String sourcePath) {
-        this.sourcePath = sourcePath;
+    @Override
+    public String toString() {
+       return fileName + "\n\t\t\tsize: " + size + " byte\tsource: " + host + ":" + port;
     }
-
 }

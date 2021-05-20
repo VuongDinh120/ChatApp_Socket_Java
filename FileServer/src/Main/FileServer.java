@@ -5,6 +5,7 @@
  */
 package Main;
 
+import Model.FileInfo;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,8 +14,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,21 +26,48 @@ import java.util.concurrent.Executors;
  */
 public class FileServer {
 
-    private static final String FileServerHost = "127.0.0.1";
-    private static final int FileServerPort = 6000;
+    private static final String MasterHost = "127.0.0.1";
+    private static final int MasterPort = 3000;
     public static final int NUM_OF_THREAD = 10;
-    public static final int SERVER_PORT = 3000;
-    public static final String sourcePath = "D:\\download\\";
+    public static int SERVER_PORT = 4000;
+    public static final String SERVER_HOST = "127.0.0.1";
+    public static String sourcePath;
 
-    public static void main(String[] args) throws IOException {
-        List<File> files = getListFile("D:\\Music\\Chrono Cross Original Soundtrack Revival Disc [FLAC]");
-        MasterServerHandler sendInfoToMaster = new MasterServerHandler(FileServerHost, FileServerPort);
-        sendInfoToMaster.createConnection(files);
-        
-        
+    public static void main(String[] args) {
+
+        SERVER_PORT = setupPort();
+        sourcePath = inputStorePath();
+        List<FileInfo> files = getListFile(sourcePath);
+        MasterServerHandler sendInfoToMaster = new MasterServerHandler(MasterPort, MasterHost);
+        sendInfoToMaster.sendFiles(files);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                ObjectOutputStream out = null;
+                try {
+                    System.out.println("Running Shutdown Hook");
+                    Socket socket = new Socket(MasterHost, MasterPort);
+                    out = new ObjectOutputStream(socket.getOutputStream());
+                    System.out.println("Send message");
+                    out.writeUTF("fileserver:exit");
+                    out.flush();
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
         ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREAD);
         DatagramSocket ServerSocket = null;
         try {
+            System.out.println("Waiting client...");
+
             ServerSocket = new DatagramSocket(SERVER_PORT);
             while (true) {
                 byte[] filename_buf = new byte[1024];
@@ -45,19 +76,19 @@ public class FileServer {
                 String filename = new String(receivePacket.getData(), 0, receivePacket.getLength());
                 int ClientPort = receivePacket.getPort();
                 InetAddress ClientAddress = receivePacket.getAddress();
-                System.out.println(sourcePath + filename);
+                System.out.println(sourcePath + "\\" + filename);
 
-                String filePath = sourcePath + filename;
+                String filePath = sourcePath + "\\" + filename;
                 File f = new File(filePath);
                 if (f.exists() && !f.isDirectory()) {
                     ClientHandler handler = new ClientHandler(ServerSocket, filePath, ClientPort, ClientAddress);
                     Thread serviceThread = new Thread(handler);
-                    System.out.println("thread: " + serviceThread.getId());
+//                    System.out.println("thread: " + serviceThread.getId());
 
                     executor.execute(serviceThread);
-                    System.out.println("----------------");
+
                 } else {
-                    System.out.println(filename + " not exists.Error");
+                    System.out.println(" Not found this file " + filename);
                 }
             }
         } catch (IOException e) {
@@ -69,16 +100,52 @@ public class FileServer {
         }
     }
 
-    public static List<File> getListFile(String path) {
+    public static List<FileInfo> getListFile(String path) {
         File folder = new File(path);
-        List<File> list = new ArrayList<>();
+        List<FileInfo> list = new ArrayList<>();
         File[] listOfFiles = folder.listFiles();
 
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.isFile()) {
-                list.add(listOfFile);
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                String name = file.getName();
+                long size = file.length();
+                FileInfo fi = new FileInfo(name, size, SERVER_PORT, SERVER_HOST);
+                list.add(fi);
             }
         }
         return list;
     }
+
+    public static String inputStorePath() {
+        Scanner scan = new Scanner(System.in);
+        String path;
+        File fi;
+        do {
+            System.out.println("Enter your files source location: ");
+            path = scan.nextLine();
+            fi = new File(path);
+
+            if (!fi.isDirectory()) {
+                System.out.println("Error: This is not a right path.");
+            }
+
+        } while (!fi.isDirectory());
+        return path;
+    }
+
+    public static int setupPort() {
+        Scanner scan = new Scanner(System.in);
+        int port;
+        do {
+            System.out.println("Enter file server port: ");
+            port = scan.nextInt();
+
+            if (port <= 2000) {
+                System.out.println("Error: port must be >= 2000");
+            }
+
+        } while (port <= 2000);
+        return port;
+    }
+
 }

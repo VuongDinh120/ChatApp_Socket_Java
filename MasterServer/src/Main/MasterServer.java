@@ -16,6 +16,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import Model.FileInfo;
+import java.io.DataInputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -23,59 +28,43 @@ import Model.FileInfo;
  */
 public class MasterServer {
 
-    private static final int MasterServerPort = 4000;
+    private static final int MasterServerPort = 3000;
     private static final String MasterServerHost = "127.0.0.1";
-
-    private static String getFileSizeMegaBytes(File file) {
-        return (double) file.length() / (1024 * 1024) + " mb";
-    }
-
-    private static String getFileSizeKiloBytes(File file) {
-        return (double) file.length() / 1024 + "  kb";
-    }
-
-    private static String getFileSizeBytes(File file) {
-        return file.length() + " bytes";
-    }
-    
-    
-    
+    private static final int NUM_OF_THREAD = 10;
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         //Tạo socket server, chờ tại cổng '3000'
-        ServerSocket fileServerSocket = new ServerSocket(MasterServerPort);
+        ServerSocket MasterServerSocket = new ServerSocket(MasterServerPort);
+        ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREAD);
+        List<FileInfo> masterFileList = new ArrayList<>();
+        Handler Tasks;
+        System.out.println("Starting Master server socket.");
+        while (true) {
+            System.out.println("Listening in address [127.0.0.1]:[3000]");
+            System.out.println("ServerSocket awaiting connections...");
+            Socket socket = MasterServerSocket.accept();
+            System.out.println("Connection from " + socket + "!");
 
-        //chờ yêu cầu từ client
-        System.out.println("ServerSocket awaiting connections...");
-        Socket connectionSocket = fileServerSocket.accept();
-        System.out.println("Connection from " + connectionSocket + "!");
+            Tasks = new Handler(socket, masterFileList);
+            Thread serviceThread = new Thread(Tasks);
+            executor.execute(serviceThread);
+            masterFileList = (List<FileInfo>) Tasks.get();
+            showAvailableFiles(masterFileList);
+        }
+    }
 
-        // get the input stream from the connected socket
-        InputStream inputStream = connectionSocket.getInputStream();
-        // create a DataInputStream so we can read data from it.
-        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-        // Tạo outputStream, nối tới socket
-        DataOutputStream outToClient
-                = new DataOutputStream(connectionSocket.getOutputStream());
-
-        //Đọc thông tin file từ socket
-        List<File> listOfFiles = (List<File>) objectInputStream.readObject();
-        outToClient.writeBytes("Master Server has receive your files info.");
-        System.out.println("Received [" + listOfFiles.size() + "] files from: " + connectionSocket);
-        // print out the text of every message
-        System.out.println("All files:");
-        listOfFiles.forEach((File fi) -> {
-            System.out.println(fi.getName() + "\t size: " + getFileSizeBytes(fi));
-            System.out.println("\t" + fi.getPath());
-        });
-
-        //ghi dữ liệu ra socket
-        System.out.println("Closing sockets.");
-        connectionSocket.close();
-        fileServerSocket.close();
+    private static void showAvailableFiles(List<FileInfo> masterFileList) {
+        System.out.println("Available files to download:");
+        if (masterFileList.isEmpty()) {
+            System.out.println("Nothing.");
+            return;
+        }
+        for (int i = 0; i < masterFileList.size(); i++) {
+            System.out.println("\t[" + i + "]. " + masterFileList.get(i).toString());
+        }
     }
 
 }
